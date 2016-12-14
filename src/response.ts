@@ -3,68 +3,50 @@ import { Socket } from 'net'
 
 const CRLF = '\r\n'
 
+export interface ResponseOptions {
+	statusMessages? : { [key:string]: string}
+	protocol?: string
+}
+
 export class Response {
 
 	statusCode = 200
 	headers: { [key: string]: string | number } = {}
-	socket: Socket
-	options: {
-		statusMessages?
-		protocol?
-	}
+	options: ResponseOptions
+	private socket: Socket
+	private _bodyStringified?: string
 
-	constructor(socket: Socket, options) {
+	constructor(socket: Socket, options: ResponseOptions = {}) {
 		this.socket = socket
-		this.options = options || {}
-		this.headers = {}
+		this.options = options
 	}
 
-	_statusMessage(statusCode) {
-		const fromOptions = (this.options.statusMessages || {})[statusCode]
-		const fromHttp = STATUS_CODES[statusCode]
-
-		return (fromOptions || fromHttp)
+	get statusMessage() {
+		const fromOptions = (this.options.statusMessages || {})[this.statusCode]
+		const fromHttp = STATUS_CODES[this.statusCode]
+		return fromOptions || fromHttp
 	}
 
-	status(statusCode: number) {
-		this.statusCode = statusCode
-		return this
+	get body() {
+		return this._bodyStringified ? JSON.parse(this._bodyStringified) : undefined
 	}
 
-	get(field: string) {
-		return this.headers[field]
+	set body(body: Object) {
+		this._bodyStringified = JSON.stringify(body)
+		this.headers['Content-Length'] = this._bodyStringified.length
 	}
 
-	set(field: string, value: string | number) {
-		this.header(field, value)
-	}
-
-	header(field: string, value: string | number) {
-		this.headers[field] = value
-	}
-
-	send(status, body) {
+	send() {
 		const protocol = this.options.protocol || 'HTTP/1.1'
 
-		body = (typeof status === 'string' || typeof status === 'object' ? status : body)
-		status = (typeof status === 'number' ? status : this.statusCode)
-
-		if (typeof body === 'object') {
-			body = JSON.stringify(body)
-		}
-
-		if (typeof body === 'string') {
-			this.set('Content-Length', body.length)
-		}
-
-		let buffer = protocol + ' ' + status + ' ' + this._statusMessage(status) + CRLF
+		let buffer = `${protocol} ${this.statusCode} ${this.statusMessage}${CRLF}`
 		Object.keys(this.headers).forEach(field => {
 			buffer += field + ':' + this.headers[field] + CRLF
 		})
 
 		buffer += CRLF
-		if (body) {
-			buffer += body
+		if (this.body) {
+			buffer += this.body
 		}
 		this.socket.write(buffer)
 	}

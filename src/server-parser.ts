@@ -1,23 +1,39 @@
-import { Parser } from './parser'
-import { Message } from './message'
-import { Response } from './response'
+import { Parser, Message } from './parser'
+import { Response, ResponseOptions } from './response'
+import { Socket } from 'net'
+
+export class ServerRequest extends Message {
+    method: string
+    path: string
+    protocol: string
+
+    constructor(method: string, path: string, protocol: string) {
+        super()
+        this.method = method
+        this.path = path
+        this.protocol = protocol
+    }
+}
 
 export class ServerParser extends Parser {
 
-    _constructMessage(firstLine: string) {
+    private responseOptions: ResponseOptions
 
-        const req = new Message()
-        const parts = firstLine.trim().split(' ')
-
-        req.method = parts[0].toUpperCase()
-        req.path = parts[1]
-        req.protocol = parts[2]
-
-        return req
+    constructor(socket: Socket, responseOptions: ResponseOptions) {
+        super(socket)
+        this.responseOptions = responseOptions
     }
 
-    _emitMessage(msg: Message) {
-        this.emit('message', msg, new Response(this._socket, this.options))
+    _constructMessage(firstLine: string) {
+        const parts = firstLine.trim().split(' ')
+        const method = parts[0].toUpperCase()
+        const path = parts[1]
+        const protocol = parts[2]
+        return new ServerRequest(method, path, protocol)
+    }
+
+    _emitMessage(msg: ServerRequest) {
+        this.emit('message', msg, new Response(this._socket, this.responseOptions))
     }
 
 }

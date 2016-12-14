@@ -1,23 +1,32 @@
-import { Writable, Readable, WritableOptions } from 'stream'
+import { Writable } from 'stream'
 import { Socket } from 'net'
-import { Message } from './message'
 
 const LINE_TERMINATOR = '\r\n'
 const HEADER_TERMINATOR = [0x0D, 0x0A, 0x0D, 0x0A]
 
+export class Message {
+    content?: Buffer
+    headers: { [key: string]: string} = {}
+}
+
+type MessageAndContentLength = {
+    message: Message,
+    contentLength: number
+}
+
 export abstract class Parser extends Writable {
 
-    _buffer = new Buffer(0)
-    _collectingContent = -1
-    _headerData = null
-    _output = null
-    _socket: Readable
-    options: WritableOptions
+    private _buffer = new Buffer(0)
+    private _collectingContent = -1
+    private _headerData: MessageAndContentLength
+    private _output = null
+    protected _socket: Socket
 
-    constructor(socket: Socket, options: WritableOptions) {
-        super(options)
-        this.options = options
-        this.on('pipe', src => this._socket = src)
+    constructor(socket: Socket) {
+        super()
+        // We know it is only possible that our source is a Socket, not just Readable
+        this.on('pipe', (src: Socket) => this._socket = src)
+        // TODO get rid of this if - surely it's never needed?
         if (socket) {
             socket.pipe(this)
         }
@@ -30,7 +39,9 @@ export abstract class Parser extends Writable {
 
         const lines = header.split(LINE_TERMINATOR)
         const firstLine = lines.shift()
-
+        if (!firstLine) {
+            throw new Error('Invalid header - no line terminator present')
+        }
         const message = this._constructMessage(firstLine)
 
         const headers: {[key: string]: string} = lines.reduce((headers: {[key: string]: string}, line) => {
@@ -59,7 +70,7 @@ export abstract class Parser extends Writable {
         }
     }
 
-    _write(chunk: Buffer, encoding, cb: Function) {
+    _write(chunk: Buffer, encoding: string, cb: Function) {
 
         this._buffer = Buffer.concat([this._buffer, chunk])
 
@@ -72,15 +83,12 @@ export abstract class Parser extends Writable {
                     return cb(null)
                 }
 
-                let info
-
                 try {
-                    info = this.parseHeader(this._buffer.slice(0, idxTerminator).toString())
+                    this._headerData = this.parseHeader(this._buffer.slice(0, idxTerminator).toString())
                 } catch (err) {
                     return cb(err)
                 }
 
-                this._headerData = info
                 this._buffer = this._buffer.slice(idxTerminator + HEADER_TERMINATOR.length)
 
                 if (this._headerData.contentLength === 0) {
