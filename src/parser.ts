@@ -1,5 +1,6 @@
 import { Writable } from 'stream'
 import { Socket } from 'net'
+import { inspect } from 'util'
 
 const LINE_TERMINATOR = '\r\n'
 const HEADER_TERMINATOR = [0x0D, 0x0A, 0x0D, 0x0A]
@@ -7,6 +8,14 @@ const HEADER_TERMINATOR = [0x0D, 0x0A, 0x0D, 0x0A]
 export class Message {
     content?: Buffer
     headers: { [key: string]: string} = {}
+
+    toString() {
+        let str = `HEADERS:\n${inspect(this.headers)}`
+        if (this.content) {
+            str += `\n\nCONTENT:${this.content}`
+        }
+        return str
+    }
 }
 
 type MessageAndContentLength = {

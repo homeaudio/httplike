@@ -5,7 +5,6 @@
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "scripts": {
-    "test": "gulp",
     "build": "tsc",
     "watch": "tsc -w"
   },
@@ -21,7 +20,8 @@
   "author": "Stephen Wan <stephen@stephenwan.net>",
   "contributors": [
     "Linus Unnebäck <linus@folkdatorn.se>",
-    "Stéphan Kochen <stephan@kochen.nl>"
+    "Stéphan Kochen <stephan@kochen.nl>",
+    "James Booth <jabooth@gmail.com§>"
   ],
   "license": "MIT",
   "bugs": {
@@ -29,16 +29,13 @@
   },
   "homepage": "https://github.com/stephen/httplike",
   "devDependencies": {
-    "gulp": "~3.6.1",
-    "gulp-jshint": "~1.5.3",
-    "gulp-mocha": "~0.4.1",
-    "jshint-stylish": "~0.1.5",
+    "@types/debug": "0.0.29",
     "mocha": "~1.18.2",
     "nock": "~0.28.3",
     "typescript": "^2.1.4"
-
   },
   "dependencies": {
-    "@types/node": "0.0.3"
+    "@types/node": "0.0.3",
+    "debug": "^2.4.4"
   }
 }

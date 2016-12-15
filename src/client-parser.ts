@@ -4,15 +4,11 @@ const RE_HEADER = /^([^ ]+) ([0-9]+) (.*)$/
 
 
 export class ClientMessage extends Message {
-    statusMessage: string
-    statusCode: number
-    protocol: string
 
-    constructor(protocol: string, statusCode: number, statusMessage: string) {
+    constructor(readonly protocol: string,
+                readonly statusCode: number,
+                readonly statusMessage: string) {
         super()
-        this.protocol = protocol
-        this.statusCode = statusCode
-        this.statusMessage = statusMessage
     }
 }
 
@@ -26,7 +22,6 @@ export class ClientParser extends Parser {
         if (m === null) {
             throw new Error('Unable to parse first line')
         }
-        const res = new Message()
 
         const protocol = m[1]
         const statusCode = Number(m[2])

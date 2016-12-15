@@ -1,6 +1,9 @@
+import * as debug from 'debug'
+import { Socket } from 'net'
 import { Parser, Message } from './parser'
 import { Response, ResponseOptions } from './response'
-import { Socket } from 'net'
+
+const log = debug('httplike:received')
 
 export class ServerRequest extends Message {
     method: string
@@ -12,6 +15,11 @@ export class ServerRequest extends Message {
         this.method = method
         this.path = path
         this.protocol = protocol
+    }
+
+    toString() {
+        let str = super.toString()
+        return str += `\nMETHOD: ${this.method} PATH: ${this.path} PROTOCOL: ${this.protocol}`
     }
 }
 
@@ -33,6 +41,7 @@ export class ServerParser extends Parser {
     }
 
     _emitMessage(msg: ServerRequest) {
+        log(msg)
         this.emit('message', msg, new Response(this._socket, this.responseOptions))
     }
 
