@@ -20,7 +20,7 @@ export class Message {
 
 type MessageAndContentLength = {
     message: Message,
-    contentLength: number
+    contentLength: number,
 }
 
 export abstract class Parser extends Writable {
@@ -33,7 +33,7 @@ export abstract class Parser extends Writable {
 
     constructor(socket: Socket) {
         super()
-        // We know it is only possible that our source is a Socket, not just Readable
+        // we know it is only possible that our source is a Socket, not just Readable
         this.on('pipe', (src: Socket) => this._socket = src)
         // TODO get rid of this if - surely it's never needed?
         if (socket) {
@@ -53,7 +53,7 @@ export abstract class Parser extends Writable {
         }
         const message = this._constructMessage(firstLine)
 
-        const headers: {[key: string]: string} = lines.reduce((headers: {[key: string]: string}, line) => {
+        message.headers = lines.reduce((headers: {[key: string]: string}, line) => {
 
             const idx = line.indexOf(':')
             const key = line.substring(0, idx).trim()
@@ -63,19 +63,18 @@ export abstract class Parser extends Writable {
                 throw new Error('Invalid header (' + line + ')')
             }
 
-            headers[key.toLowerCase()] = val
-
-            return headers
+            return {
+                ...headers,
+                [key.toLowerCase()]: val,
+            }
         }, {})
 
-        message.headers = headers
-
-        const hasContent = headers.hasOwnProperty('content-length')
-        const contentLength = (hasContent ? Number(headers['content-length']) : 0)
+        const hasContent = message.headers.hasOwnProperty('content-length')
+        const contentLength = (hasContent ? Number(message.headers['content-length']) : 0)
 
         return {
-            message: message,
-            contentLength: contentLength
+            contentLength,
+            message,
         }
     }
 
@@ -131,7 +130,7 @@ function bufferIndexOf(haystack: Buffer, needle: number[]) {
     const max = haystack.length - nLen
     outer: for (let i = 0; i <= max; i++) {
         for (let j = 0; j < nLen; j++) {
-            if(haystack[i + j] !== needle[j]) {
+            if (haystack[i + j] !== needle[j]) {
                 continue outer
             }
         }

@@ -21,6 +21,7 @@ export class ServerRequest extends Message {
         let str = super.toString()
         return str += `\nMETHOD: ${this.method} PATH: ${this.path} PROTOCOL: ${this.protocol}`
     }
+
 }
 
 export class ServerParser extends Parser {

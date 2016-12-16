@@ -6,7 +6,8 @@
   "types": "./lib/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "lint": "tslint -c tslint.json ./src/*.ts"
   },
   "repository": {
     "type": "git",
@@ -32,6 +33,7 @@
     "@types/debug": "0.0.29",
     "mocha": "~1.18.2",
     "nock": "~0.28.3",
+    "tslint": "^4.1.0",
     "typescript": "^2.1.4"
   },
   "dependencies": {

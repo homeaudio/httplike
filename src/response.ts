@@ -6,58 +6,58 @@ const CRLF = '\r\n'
 const log = debug('httplike:response')
 
 export interface ResponseOptions {
-	statusMessages? : { [key:string]: string}
-	protocol?: string
+    statusMessages?: { [key: string]: string }
+    protocol?: string
 }
 
 export class Response {
 
-	statusCode = 200
-	headers: { [key: string]: string | number } = {}
-	readonly socket: Socket
-	private options: ResponseOptions
-	private bodyStringified?: string
+    statusCode = 200
+    headers: { [key: string]: string | number } = {}
+    readonly socket: Socket
+    private options: ResponseOptions
+    private bodyStringified?: string
 
-	constructor(socket: Socket, options: ResponseOptions = {}) {
-		this.socket = socket
-		this.options = options
-	}
+    constructor(socket: Socket, options: ResponseOptions = {}) {
+        this.socket = socket
+        this.options = options
+    }
 
-	get statusMessage() {
-		const fromOptions = (this.options.statusMessages || {})[this.statusCode]
-		const fromHttp = STATUS_CODES[this.statusCode]
-		return fromOptions || fromHttp
-	}
+    get statusMessage() {
+        const fromOptions = (this.options.statusMessages || {})[this.statusCode]
+        const fromHttp = STATUS_CODES[this.statusCode]
+        return fromOptions || fromHttp
+    }
 
-	get body() {
-		return this.bodyStringified ? JSON.parse(this.bodyStringified) : undefined
-	}
+    get body() {
+        return this.bodyStringified ? JSON.parse(this.bodyStringified) : undefined
+    }
 
-	set body(body: Object) {
-		this.bodyStringified = JSON.stringify(body)
-		this.headers['content-length'] = this.bodyStringified.length
-	}
+    set body(body: Object) {
+        this.bodyStringified = JSON.stringify(body)
+        this.headers['content-length'] = this.bodyStringified.length
+    }
 
-	send() {
-		const protocol = this.options.protocol || 'HTTP/1.1'
+    send() {
+        const protocol = this.options.protocol || 'HTTP/1.1'
 
-		let buffer = `${protocol} ${this.statusCode} ${this.statusMessage}${CRLF}`
+        let buffer = `${protocol} ${this.statusCode} ${this.statusMessage}${CRLF}`
 
-		Object.keys(this.headers).forEach(field => {
-			buffer += field + ':' + this.headers[field] + CRLF
-		})
+        Object.keys(this.headers).forEach(field => {
+            buffer += field + ':' + this.headers[field] + CRLF
+        })
 
-		buffer += CRLF
-		if (this.body) {
-			buffer += this.bodyStringified
-		}
-		log(this)
-		this.socket.write(buffer)
-	}
+        buffer += CRLF
+        if (this.body) {
+            buffer += this.bodyStringified
+        }
+        log(this)
+        this.socket.write(buffer)
+    }
 
-	inspect(depth: number, optionsIn: any) {
-		const obj: any = this
-		const {socket, options, ...x} = obj
-		return x
-	}
+    inspect(depth: number, optionsIn: any) {
+        const obj: any = this
+        const {socket, options, ...x} = obj
+        return x
+    }
 }
