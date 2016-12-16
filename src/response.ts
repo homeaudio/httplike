@@ -14,8 +14,8 @@ export class Response {
 
 	statusCode = 200
 	headers: { [key: string]: string | number } = {}
+	readonly socket: Socket
 	private options: ResponseOptions
-	private socket: Socket
 	private bodyStringified?: string
 
 	constructor(socket: Socket, options: ResponseOptions = {}) {
