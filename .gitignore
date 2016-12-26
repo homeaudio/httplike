@@ -1,5 +1,6 @@
 # Ignore compiled output
-lib
+lib/**/*.js
+*.js.map
 
 lib-cov
 *.seed
