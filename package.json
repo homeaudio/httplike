@@ -33,11 +33,11 @@
     "@types/debug": "0.0.29",
     "mocha": "~1.18.2",
     "nock": "~0.28.3",
-    "tslint": "^4.1.0",
+    "tslint": "^4.2.0",
     "typescript": "^2.1.4"
   },
   "dependencies": {
-    "@types/node": "0.0.3",
-    "debug": "^2.4.4"
+    "@types/node": "6.0.54",
+    "debug": "^2.4.5"
   }
 }
