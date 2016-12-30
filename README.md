@@ -15,8 +15,8 @@ npm install @homeaudio/httplike
 ```
 
 ## Usage
-```
-import {ServerParser from 'httplike'
+```typescript
+import { ServerParser } from 'httplike'
 const p = new Parser(socket)
 p.on('message', (msg) => {
   console.log(msg.method)
