@@ -1,24 +1,28 @@
 httplike
 ========
 
-[![Build Status](https://travis-ci.org/stephen/httplike.svg?branch=master)](https://travis-ci.org/stephen/httplike)
-
 node.js package for parsing http-like protocols
+
+# IMPORTANT NOTE - TYPESCRIPT FORK
+
+This is a fork of [stephen/httplike](github.com/stephen/httplike) that @jabooth undertook for fun in Dec 2016. I moved `httplike` and a handful of other projects to Typescript and placed them under a new namespace at @homeaudio in an effort to better understand and rapidly improve all these interrelated projects.
+
+For now I'm maintaining my forks at @homeaudio, but I would be delighted if these forks were re-unified with their original projects at some point. Given the extensive nature of the changes made though, I understand that this may be challenging for the original authors.
 
 ## Installation
 ```
-npm install httplike
+npm install @homeaudio/httplike
 ```
 
 ## Usage
 ```
-var Parser = require('httplike');
-var p = new Parser(socket);
-p.on('message', function(msg) {
-  console.log(msg.method);
-  console.log(msg.headers);
-  console.log(msg.content);
-});
+import {ServerParser from 'httplike'
+const p = new Parser(socket)
+p.on('message', (msg) => {
+  console.log(msg.method)
+  console.log(msg.headers)
+  console.log(msg.content)
+})
 ```
 
 ## Protocol Assumptions
@@ -26,6 +30,11 @@ p.on('message', function(msg) {
 ```httplike``` assumes that the incoming protocol follows HTTP standards on using the Content-Length header to determine how many bytes to wait for in a response body.
 
 ## Changelog
+
+##### 2.0.0
+- Migration to Typescript
+- Adoption of ES2015+ style and features
+- New fork maintained at @homeaudio for now
 
 ##### 1.0.1
 - Fixed parsing involving UTF-8 characters (PR #8), and potential stall in pipelined requests (PR #9)
