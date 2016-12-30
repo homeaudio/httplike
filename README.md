@@ -35,6 +35,9 @@ p.on('message', (msg) => {
 - Migration to Typescript
 - Adoption of ES2015+ style and features
 - New fork maintained at @homeaudio for now
+- headers should be set and accessed using `server.headers[KEY] = VALUE` - this is now typesafe, so the `setHeader` method is retired for this cleaner API.
+- numerous small API changes - these will be properly documented in a future release
+- tests are currently present but broken
 
 ##### 1.0.1
 - Fixed parsing involving UTF-8 characters (PR #8), and potential stall in pipelined requests (PR #9)
